@@ -10,7 +10,7 @@ function connectDatabase() {
 // connectDatabase().then(() => {
 const instance = new Query()
 instance.aggregate()
-	.lookup({ from: "model", field: "field", refField: "refField", as: "as" })
+	.lookup({ from: "model", localField: "field", foreignField: "refField", as: "as" })
 	.match({
 		_id: "507f191e810c19729de860ea",
 		object: { _id: "507f191e810c19729de860ea" },

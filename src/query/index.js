@@ -7,7 +7,7 @@ class Query {
 		this.pipeline = []
 
 		this.option = {
-			lookup: { from: null, field: null, refField: null, as: null, many: false, skipNullRecord: true }
+			lookup: { from: null, field: null, foreignField: null, as: null, many: false, skipNullRecord: true }
 		}
 	}
 	aggregate(search) {
@@ -17,16 +17,25 @@ class Query {
 }
 
 class AggregateOption extends Query {
-	lookup({ from, field, refField, as, many = false, skipNullRecord = true }) {
-		let option = { from, field, refField, as, many, skipNullRecord }
+	lookup({ from, localField, foreignField, as, many = false, skipNullRecord = true }) {
+		let option = { from, localField, foreignField, as, many, skipNullRecord }
 		option = initOption(option, this.option.lookup)
 
 		// Validate field
-		validateField('LOOKUP')(option.from, option.field, option.refField, option.as, option.many, option.skipNullRecord)
+		validateField('LOOKUP')(option.from, option.localField, option.foreignField, option.as, option.many, option.skipNullRecord)
 
 		this.pipeline.push({
-			$lookup: { from: option.from, localField: option.field, foreignField: option.refField, as: option.as },
+			$lookup: {
+				from: from,
+				let: { fromId: "$" + localField },
+				pipeline: [
+					{ $match: { $expr: { $eq: ["$" + foreignField, "$$fromId"] } }, },
+					{ $project: { _id: 1, username: 1 } }
+				],
+				as: as
+			}
 		})
+
 		if (!option.many) {
 			this.pipeline.push({
 				$unwind: { path: "$" + as, preserveNullAndEmptyArrays: option.skipNullRecord },
@@ -37,6 +46,11 @@ class AggregateOption extends Query {
 	match(condition) {
 		convertMongoUUIDToObjectId(condition)
 		this.pipeline.push({ $match: condition })
+		return this
+	}
+
+	custom(pipeline) {
+		this.pipeline.push(pipeline)
 		return this
 	}
 
