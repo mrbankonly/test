@@ -1,2 +1,4 @@
 node_modules
 package-lock.json
+index.test.js
+src/query/index.test.js
