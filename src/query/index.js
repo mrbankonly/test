@@ -1,4 +1,3 @@
-const { default: mongoose } = require("mongoose")
 const { initOption, validateField, convertMongoUUIDToObjectId } = require("./utils")
 
 class Query {
