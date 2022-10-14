@@ -1,6 +1,5 @@
 # exp-mgo-tooling
-#### Update: v1 (Development)
-Made faster for query for mongodb and mongoose only
+Made faster for query for express and mongoose
 
 ### Modules
 - **Query** helper for MongoDB mongoose
