@@ -1,8 +1,10 @@
-# exp-mgo-tooling
-Made faster for query for express and mongoose
+# exp-mgo-toolings
+Made faster query for express and mongoose
 
 ### Modules
 - **Query** helper for MongoDB mongoose
+	**Required packages**
+	- bson
 - **AWS** helper easy use and include resize before upload
 	**Required packages**
 	- aws-sdk
@@ -17,6 +19,16 @@ Made faster for query for express and mongoose
 	- nodemailer
 - **Api Response** for express made code easier to handle error and standard response
 - **asyncHandler** handler all error and no more try catch block every where
+
+#### If you want to ignore package from other modules
+- Import directly from DIR
+```js
+const asyncHandle = require("exp-mgo-toolings/src/async-handler")
+const ApiResponse = require("exp-mgo-toolings/src/api-response")
+const Aws = require("exp-mgo-toolings/src/aws")
+const Mail = require("exp-mgo-toolings/src/mail")
+const PubNub = require("exp-mgo-toolings/src/pubnub")
+```
 
 ### # Query function's description
 **Automatic Detect**  query params from query string
@@ -271,4 +283,66 @@ app.get("/",asyncHandle(async ({ body, res, opts, commit }) => {
 }, mongoose))
 ```
 
-### More docs is comming I am tried now :D
+### #AWS File upload
+**Important ENV must specific** 
+Don't worry I wont save your credential XD
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_KEY
+- AWS_S3_BUCKET_NAME
+
+#### Methods
+**uploadFile()** 
+<mark style="background-color: #e1e5f5;padding: 5px"><b>file</b></mark> file as buffer ex: req.file.image
+<mark style="background-color: #e1e5f5;padding: 5px"><b>bucket</b></mark> (optional) default is set in ENV
+<mark style="background-color: #e1e5f5;padding: 5px"><b>fileType</b></mark> file's format jpg,png...
+<mark style="background-color: #e1e5f5;padding: 5px"><b>path</b></mark> storage path
+<mark style="background-color: #e1e5f5;padding: 5px"><b>file_name</b></mark> by default it will generate file name as uuid string for you if you want to generate your own file's name then use this
+<mark style="background-color: #e1e5f5;padding: 5px"><b>origin_filename</b></mark> use original file's name
+<mark style="background-color: #e1e5f5;padding: 5px"><b>return_only_name</b></mark> by default will return with path if you want to return only filename then set this to "true"
+
+**upload() and uploadMany()** 
+<mark style="background-color: #e1e5f5;padding: 5px"><b>file</b></mark> file as buffer ex: req.file.image
+<mark style="background-color: #e1e5f5;padding: 5px"><b>bucket</b></mark> (optional) default is set in ENV
+<mark style="background-color: #e1e5f5;padding: 5px"><b>fileType</b></mark> file's format jpg,png...
+<mark style="background-color: #e1e5f5;padding: 5px"><b>path</b></mark> storage path
+<mark style="background-color: #e1e5f5;padding: 5px"><b>resize</b></mark> (Optional) ex: we want to resize image to 256px then set [256] or multiple size [500,256]
+
+Example usage
+```js
+// Ex1: Sample usage
+const filename = await AwsFunc.upload({
+	file: req.files.image,
+	fileType: "jpg",
+	path: "some_path/"
+})
+
+// Ex2: With resize
+const filename = await AwsFunc.upload({
+	file: req.files.image,
+	fileType: "jpg",
+	resize: [256, 800],
+	path: "some_path/"
+})
+
+// Ex3: Multiple File
+const filename = await AwsFunc.uploadMany({
+	file: req.files.image,
+	fileType: "jpg",
+	path: "some_path/"
+})
+
+// Ex4: Multiple File With resize
+const filename = await AwsFunc.uploadMany({
+	file: req.files.image,
+	fileType: "jpg",
+	resize: [256, 800],
+	path: "some_path/"
+})
+```
+
+
+
+
+
+
+

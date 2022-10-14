@@ -1,14 +1,16 @@
 {
 	"name": "exp-mgo-toolings",
-	"version": "1.0.1",
+	"version": "1.0.7",
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"rror: no test specified\" && exit 1"
 	},
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"bson": "^4.7.0"
+		"bson": "^4.7.0",
+		"dotenv": "^16.0.3",
+		"nodemailer": "^6.8.0"
 	}
 }
