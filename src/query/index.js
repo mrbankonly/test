@@ -33,7 +33,10 @@ const populateDynamic = (associate) => {
 class AggregateOption extends Query {
 	constructor(modelInstance, mongooseInstance) {
 		super()
-		if (typeof modelInstance !== "string") modelInstance = modelInstance.modelName
+		if (typeof modelInstance !== "string") {
+			if (!modelInstance.modelName) throw new Error("Must specific model instance or model name")
+			modelInstance = modelInstance.modelName
+		}
 		this.modelInstance = mongooseInstance.model(modelInstance)
 		this.mongooseInstance = mongooseInstance
 	}
@@ -47,7 +50,7 @@ class AggregateOption extends Query {
 		// Validate field
 		validateField('LOOKUP')(option.from, option.localField, option.foreignField, option.as, option.many, option.skipNullRecord)
 
-		const loopupPipline = [
+		const lookupPipeline = [
 			{ $match: { $expr: { $eq: ["$" + foreignField, "$$fromId"] } }, },
 		]
 
@@ -55,9 +58,9 @@ class AggregateOption extends Query {
 			const selectSplit = select.split(" ")
 			let selectField = {}
 			for (let i = 0; i < selectSplit.length; i++) selectField[selectSplit[i]] = 1
-			loopupPipline.push({ $project: selectField })
+			lookupPipeline.push({ $project: selectField })
 			if (option.unset && Array.isArray(option.unset) && option.unset.length > 0) {
-				loopupPipline.push({ $unset: option.unset })
+				lookupPipeline.push({ $unset: option.unset })
 			}
 		}
 
@@ -65,7 +68,7 @@ class AggregateOption extends Query {
 			$lookup: {
 				from: from,
 				let: { fromId: "$" + localField },
-				pipeline: loopupPipline,
+				pipeline: lookupPipeline,
 				as: as
 			}
 		})
@@ -119,7 +122,7 @@ class AggregateOption extends Query {
 		// Validate field
 		validateField('LOOKUP')(option.from, option.localField, option.foreignField, option.as, option.many, option.skipNullRecord)
 
-		const loopupPipline = [
+		const lookupPipeline = [
 			{ $match: { $expr: { $eq: ["$" + option.foreignField, "$$fromId"] } }, },
 		]
 
@@ -127,9 +130,9 @@ class AggregateOption extends Query {
 			const selectSplit = select.split(" ")
 			let selectField = {}
 			for (let i = 0; i < selectSplit.length; i++) selectField[selectSplit[i]] = 1
-			loopupPipline.push({ $project: selectField })
+			lookupPipeline.push({ $project: selectField })
 			if (unset && Array.isArray(unset) && unset.length > 0) {
-				loopupPipline.push({ $unset: unset })
+				lookupPipeline.push({ $unset: unset })
 			}
 		}
 
@@ -137,7 +140,7 @@ class AggregateOption extends Query {
 			$lookup: {
 				from: from,
 				let: { fromId: "$" + option.localField },
-				pipeline: loopupPipline,
+				pipeline: lookupPipeline,
 				as: option.as
 			}
 		})
@@ -148,7 +151,7 @@ class AggregateOption extends Query {
 			})
 		}
 
-		if (populate) this._subPopulate(populate, path)
+		if (populate) this._nextPopulate(populate, path)
 		return this
 	}
 
@@ -163,13 +166,12 @@ class AggregateOption extends Query {
 		return this
 	}
 
-	_subPopulate(dynamicPopulates, mainPath, thirdPath) {
+	_nextPopulate(dynamicPopulates, mainPath, thirdPath) {
 		dynamicPopulates = Array.isArray(dynamicPopulates) ? dynamicPopulates : [dynamicPopulates]
 
 		for (let popI = 0; popI < dynamicPopulates.length; popI++) {
 			let dynamicPopulate = dynamicPopulates[popI];
 			const populateResult = populateDynamic(dynamicPopulates[popI])
-
 
 			if (Array.isArray(dynamicPopulate)) throw new Error('Array populate not support yet')
 
@@ -200,7 +202,7 @@ class AggregateOption extends Query {
 			// Validate field
 			validateField('LOOKUP')(option.from, option.localField, option.foreignField, option.as, option.many, option.skipNullRecord)
 
-			const loopupPipline = [
+			const lookupPipeline = [
 				{ $match: { $expr: { $eq: ["$" + option.foreignField, "$$fromId"] } }, },
 			]
 
@@ -208,9 +210,9 @@ class AggregateOption extends Query {
 				const selectSplit = select.split(" ")
 				let selectField = {}
 				for (let i = 0; i < selectSplit.length; i++) selectField[selectSplit[i]] = 1
-				loopupPipline.push({ $project: selectField })
+				lookupPipeline.push({ $project: selectField })
 				if (unset && Array.isArray(unset) && unset.length > 0) {
-					loopupPipline.push({ $unset: unset })
+					lookupPipeline.push({ $unset: unset })
 				}
 			}
 
@@ -218,7 +220,7 @@ class AggregateOption extends Query {
 				$lookup: {
 					from: from,
 					let: { fromId: "$" + option.localField },
-					pipeline: loopupPipline,
+					pipeline: lookupPipeline,
 					as: option.as
 				}
 			})
@@ -228,7 +230,7 @@ class AggregateOption extends Query {
 					$unwind: { path: "$" + option.as, preserveNullAndEmptyArrays: option.skipNullRecord },
 				})
 			}
-			if (populate) this._subPopulate(populate, modelName, mainPath)
+			if (populate) this._nextPopulate(populate, modelName, mainPath)
 		}
 
 		return this
