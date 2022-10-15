@@ -249,11 +249,13 @@ const result = await excute.
 
 ### # ApiResponse with asyncHandler
 **API RESPONSE Usage description**
+- Overview Ex: Throw new Error(`StatusCode-ErrorCode::Message`)
 - Ex1: Throw new Error(`400::Your error message`)
 - Ex2: Throw new Error(`Your error message`) Default 500 status
-- Ex2 Multi language: Throw new Error(`400::en=English message && la=Lao message`)
-- Ex3 With error CODE as ER001: Throw new Error(`400-ER001::Your error message`)
-
+- Ex3: Multi language: Throw new Error(`400::en=English message && la=Lao message`)
+- Ex4: With error CODE as ER001: Throw new Error(`400-ER001::Your error message`)
+- EX5: No Message use throw new Error(`400-ERR001`) Default message "Request failed"
+- EX6: No Message & No Error Code use throw new Error(`400`) Default message "Request failed" and "ERR500" for error code
 #### Let's try in express and asyncHandle
 ```js
 const { asyncHandle, ApiResponse } = require("exp-mgo-toolings")
@@ -292,19 +294,31 @@ Don't worry I wont save your credential XD
 
 #### Methods
 **uploadFile()** 
+
 <mark style="background-color: #e1e5f5;padding: 5px"><b>file</b></mark> file as buffer ex: req.file.image
+
 <mark style="background-color: #e1e5f5;padding: 5px"><b>bucket</b></mark> (optional) default is set in ENV
+
 <mark style="background-color: #e1e5f5;padding: 5px"><b>fileType</b></mark> file's format jpg,png...
+
 <mark style="background-color: #e1e5f5;padding: 5px"><b>path</b></mark> storage path
+
 <mark style="background-color: #e1e5f5;padding: 5px"><b>file_name</b></mark> by default it will generate file name as uuid string for you if you want to generate your own file's name then use this
+
 <mark style="background-color: #e1e5f5;padding: 5px"><b>origin_filename</b></mark> use original file's name
+
 <mark style="background-color: #e1e5f5;padding: 5px"><b>return_only_name</b></mark> by default will return with path if you want to return only filename then set this to "true"
 
 **upload() and uploadMany()** 
+
 <mark style="background-color: #e1e5f5;padding: 5px"><b>file</b></mark> file as buffer ex: req.file.image
+
 <mark style="background-color: #e1e5f5;padding: 5px"><b>bucket</b></mark> (optional) default is set in ENV
+
 <mark style="background-color: #e1e5f5;padding: 5px"><b>fileType</b></mark> file's format jpg,png...
+
 <mark style="background-color: #e1e5f5;padding: 5px"><b>path</b></mark> storage path
+
 <mark style="background-color: #e1e5f5;padding: 5px"><b>resize</b></mark> (Optional) ex: we want to resize image to 256px then set [256] or multiple size [500,256]
 
 Example usage
