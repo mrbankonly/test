@@ -323,7 +323,7 @@ class AggregateOption extends Query {
 			let startDate = new Date(req.query.start_date + " 00:00:00")
 			let endDate = new Date(req.query.end_date + " 23:59:59")
 
-			if (startDate === "Invalid Date" || endDate === "Invalid Date") {
+			if (startDate.toString() === "Invalid Date" || endDate.toString() === "Invalid Date") {
 				throw new Error("400::Invalid Start & End date")
 			}
 			this.pipeline.push({ $match: { [`${this.dateField}`]: { $gte: startDate, $lte: endDate } } })
