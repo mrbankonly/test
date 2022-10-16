@@ -32,6 +32,8 @@ class Validator {
 	}
 
 	item(field, message, required) {
+
+		console.log(this.arrayItems)
 		if (Array.isArray(this.arrayItems)) this.arrayItems = {}
 		if (typeof this.arrayItems !== "object") this.arrayItems = {}
 		const next = new ValidateRule(field, message, this.arrayItems[field], this.self, required, this.parentField)
@@ -60,6 +62,7 @@ class ValidateRule extends Validator {
 		this.value = value
 		this.parent = parent
 		this.parentField = parentField
+		console.log(parent)
 	}
 	required() {
 		if (this.arrayItems) {
