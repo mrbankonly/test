@@ -7,6 +7,7 @@ class Validator {
 	resultBody = {}
 	resultQuery = {}
 	resultHeaders = {}
+	validKeys = {}
 	constructor(param1, params2, self) {
 		const req = param1
 		this.req = param1
@@ -17,6 +18,7 @@ class Validator {
 		this.convertedBody = req.items
 		this.self = self || this
 		this.objectCount = 0
+
 		if (req.items) {
 			this.self.convertedBody = req.items
 		}
@@ -31,22 +33,25 @@ class Validator {
 		const { value, isArrayField } = getFieldFormObject(this._body, this)
 		this.convertedBody = value
 		field = isArrayField ? isArrayField : field
+		this.validKeys[field] = value[field]
 		const next = new ValidateRule(field, message, value[field], this, required)
 		return next
 	}
 	query(field, message, required) {
+		this.validKeys[field] = value[field]
 		message = message || "Validate error on " + field
 		const next = new ValidateRule(field, message, this._body[field], this, required)
 		return next
 	}
 	header(field, message, required) {
+		this.validKeys[field] = value[field]
 		message = message || "Validate error on " + field
 		const next = new ValidateRule(field, message, this._body[field], this, required)
 		return next
 	}
 
 	async validate(options = {
-		restrictKey: false,
+		restrictKey: true,
 		allowNull: false,
 		useError: false,
 		storeContext: null
@@ -92,10 +97,24 @@ class Validator {
 		const errorKeys = Object.keys(this.errors)
 		for (let i = 0; i < errorKeys.length; i++) {
 			const errorKey = errorKeys[i];
+
+			if (options.useError) {
+				throw new Error(`400::${this.errors[errorKey]}`)
+			}
 			messages.push({
 				from: errorKey,
 				detail: this.errors[errorKey]
 			})
+		}
+
+		if (options.restrictKey) {
+			const bodyKey = Object.keys(this._body);
+			const isValidRequest = bodyKey.every((key) => {
+				const find = Object.keys(this.validKeys).includes(key)
+				return find
+			}
+			);
+			if (!isValidRequest) throw new Error(`400::bad_request`)
 		}
 
 		const next = new ValidateResult(messages)
